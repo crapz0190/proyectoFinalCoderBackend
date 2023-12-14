@@ -97,6 +97,7 @@ passport.use(
       callbackURL: confEnv.GITHUB_CALLBACK_URL,
     },
     async (accessToken, refreshToken, profile, done) => {
+      console.log("GITHUB ---> ", profile);
       try {
         const userDB = await userRepository.findByEmail(profile._json.email);
         // Login
@@ -108,6 +109,8 @@ passport.use(
           }
         }
 
+        const cart = await cartRepository.createOne();
+
         // Signup
         const infoUser = {
           first_name: profile._json.name.split(" ")[0],
@@ -115,7 +118,9 @@ passport.use(
           email: profile._json.email,
           password: "",
           isGithub: true,
+          cart: cart._id,
         };
+
         const createUser = await userRepository.createOne(infoUser);
         done(null, createUser);
       } catch (e) {
