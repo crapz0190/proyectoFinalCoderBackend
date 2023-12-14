@@ -1,6 +1,8 @@
 import { userRepository } from "../services/repository/users.repository.js";
 import { hashData } from "../utils.js";
 import { generateToken } from "../libs/jwt.js";
+import UserReqDTO from "../dto/user.login.req.dto.js";
+import UserResCurrent from "../dto/user.current.res.dto.js";
 
 class SessionController {
   // Metodo GET permite desde un boton cerrar sesion
@@ -17,6 +19,9 @@ class SessionController {
   // Metodo POST permite registrarse en la DB
   access = async (req, res) => {
     try {
+      const user = await userRepository.findByEmail(req.user.email);
+      const userDTO = new UserResCurrent(user);
+      console.log("USER DTO ---> ", userDTO);
       return res.redirect("/products");
     } catch (e) {
       return res.status(500).json({ status: "error", message: e.message });
@@ -27,11 +32,14 @@ class SessionController {
   loginUser = (req, res) => {
     try {
       //jwt
-      const { first_name, last_name, email, role } = req.user;
-      const token = generateToken({ first_name, last_name, email, role });
+      // const { first_name, last_name, email, role } = req.user;
+      const userDTO = new UserReqDTO(req.user);
+      const { name, surname, email, role } = userDTO;
+      const token = generateToken({ name, surname, email, role });
+      // const token = generateToken({ first_name, last_name, email, role });
       res.cookie("token", token, { httpOnly: true });
       res.redirect("/api/sessions/current");
-      const user = req.user;
+      const user = userDTO;
       return user;
     } catch (e) {
       return res.status(500).json({ status: "error", message: e.message });
