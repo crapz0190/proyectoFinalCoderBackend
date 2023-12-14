@@ -1,10 +1,10 @@
-import { productsManager } from "../dao/managers/productsManager.js";
+import { productRepository } from "../services/repository/products.repository.js";
 
 class ProductController {
   // Metodo GET para mostrar productos por paginado
   allProducts = async (req, res) => {
     try {
-      const allProducts = await productsManager.paginate(req.query);
+      const allProducts = await productRepository.paginate(req.query);
       if (allProducts.length === 0) {
         return res
           .status(404)
@@ -21,7 +21,7 @@ class ProductController {
   productById = async (req, res) => {
     const { pid } = req.params;
     try {
-      const productById = await productsManager.getById(pid);
+      const productById = await productRepository.findById(pid);
       if (!productById) {
         return res
           .status(404)
@@ -67,7 +67,7 @@ class ProductController {
     obj.thumbnails = files;
 
     try {
-      const createdProduct = await productsManager.createOne(obj);
+      const createdProduct = await productRepository.createOne(obj);
       if (!createdProduct) {
         return res
           .status(500)
@@ -114,13 +114,13 @@ class ProductController {
     obj.thumbnails = files;
 
     try {
-      const foundId = await productsManager.getById(pid);
+      const foundId = await productRepository.findById(pid);
       if (!foundId) {
         return res
           .status(404)
           .json({ status: "error", message: "Product not found" });
       } else {
-        const updateProduct = await productsManager.updateOne(pid, obj);
+        const updateProduct = await productRepository.updateOne(pid, obj);
         return res.status(200).json({ status: "success", updateProduct });
       }
     } catch (e) {
@@ -132,7 +132,7 @@ class ProductController {
   removeProductById = async (req, res) => {
     const { pid } = req.params;
 
-    const foundId = await productsManager.getById(pid);
+    const foundId = await productRepository.findById(pid);
     if (!foundId) {
       return res
         .status(404)
@@ -140,7 +140,7 @@ class ProductController {
     }
 
     try {
-      const removeProduct = await productsManager.deleteOne(pid);
+      const removeProduct = await productRepository.deleteOne(pid);
       if (removeProduct) {
         return res.status(200).json({ status: "success", removeProduct });
       } else {

@@ -1,11 +1,11 @@
 import passport from "passport";
-import { usersManager } from "./dao/managers/usersManager.js";
-import { cartsManager } from "./dao/managers/cartsManager.js";
+import { userRepository } from "./services/repository/users.repository.js";
+import { cartRepository } from "./services/repository/carts.repository.js";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Strategy as GitHubStrategy } from "passport-github2";
 import { Strategy as JWTStrategy, ExtractJwt } from "passport-jwt";
 import { hashData, compareData } from "./utils.js";
-import env from "./dotenv.js";
+import { confEnv } from "./config.js";
 
 // -------------- Local ----------------
 passport.use(
@@ -19,11 +19,11 @@ passport.use(
         return done(null, false, { message: "All fields are required" });
       }
 
-      const cart = await cartsManager.createCart();
+      const cart = await cartRepository.createOne();
 
       try {
         const hashPassword = await hashData(password);
-        const createdUser = await usersManager.createOne({
+        const createdUser = await userRepository.createOne({
           ...req.body,
           password: hashPassword,
           cart: cart._id,
@@ -48,7 +48,7 @@ passport.use(
       }
 
       try {
-        const user = await usersManager.findByEmail(email);
+        const user = await userRepository.findByEmail(email);
         if (!user) {
           return done(null, false, { message: "Incorrect email or password" });
         }
@@ -73,7 +73,7 @@ const fromCookies = (req) => {
 
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromExtractors([fromCookies]),
-  secretOrKey: env.TOKEN_SECRET_JWT,
+  secretOrKey: confEnv.TOKEN_SECRET_JWT,
 };
 
 passport.use(
@@ -92,13 +92,13 @@ passport.use(
   "github",
   new GitHubStrategy(
     {
-      clientID: env.GITHUB_CLIENT_ID,
-      clientSecret: env.GITHUB_CLIENT_SECRET,
-      callbackURL: env.GITHUB_CALLBACK_URL,
+      clientID: confEnv.GITHUB_CLIENT_ID,
+      clientSecret: confEnv.GITHUB_CLIENT_SECRET,
+      callbackURL: confEnv.GITHUB_CALLBACK_URL,
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        const userDB = await usersManager.findByEmail(profile._json.email);
+        const userDB = await userRepository.findByEmail(profile._json.email);
         // Login
         if (userDB) {
           if (userDB.isGithub) {
@@ -116,7 +116,7 @@ passport.use(
           password: "",
           isGithub: true,
         };
-        const createUser = await usersManager.createOne(infoUser);
+        const createUser = await userRepository.createOne(infoUser);
         done(null, createUser);
       } catch (e) {
         done(e);
@@ -131,7 +131,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const user = await usersManager.getById(id);
+    const user = await userRepository.findById(id);
     done(null, user);
   } catch (e) {
     done(e);

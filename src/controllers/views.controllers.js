@@ -1,7 +1,10 @@
 /* eslint-disable no-dupe-keys */
-import { productsManager } from "../dao/managers/productsManager.js";
-import { messagesManager } from "../dao/managers/messagesManager.js";
-import { cartsManager } from "../dao/managers/cartsManager.js";
+// import { productService } from "../services/products.service.js";
+// import { messageService } from "../services/messages.service.js";
+// import { cartService } from "../services/carts.service.js";
+import { productRepository } from "../services/repository/products.repository.js";
+import { messageRepository } from "../services/repository/messages.repository.js";
+import { cartRepository } from "../services/repository/carts.repository.js";
 
 class ViewsControllers {
   home = async (req, res) => {
@@ -22,7 +25,7 @@ class ViewsControllers {
     const roleUser = role === "user";
 
     try {
-      const getMessages = await messagesManager.findAll();
+      const getMessages = await messageRepository.findAll();
       return res.render("messages", {
         title: "Messages | Handlebars",
         messages: getMessages,
@@ -44,7 +47,7 @@ class ViewsControllers {
     const roleUser = role === "user";
 
     try {
-      const messages = await messagesManager.getById(mid);
+      const messages = await messageRepository.findById(mid);
       const { _id, email, description } = messages;
 
       return res.render("updateMessages", {
@@ -73,7 +76,7 @@ class ViewsControllers {
     const roleUser = role === "user";
 
     try {
-      const products = await productsManager.paginate(req.query);
+      const products = await productRepository.paginate(req.query);
       const {
         payload,
         totalPages,
@@ -131,7 +134,7 @@ class ViewsControllers {
   // Metodo GET para mostrar detalles del producto seleccionado
   productDetail = async (req, res) => {
     const { pid } = req.params;
-    const cartFound = await cartsManager.getById(req.user.cart);
+    const cartFound = await cartRepository.findById(req.user.cart);
     const idCart = cartFound._id;
     const { cart, role } = req.user;
 
@@ -139,7 +142,7 @@ class ViewsControllers {
     const roleUser = role === "user";
 
     try {
-      const product = await productsManager.getById(pid);
+      const product = await productRepository.findById(pid);
       const thumbnailsData = product.thumbnails.map(
         (thumbnail) => `/images/${thumbnail}`
       );
@@ -173,7 +176,7 @@ class ViewsControllers {
     const roleUser = role === "user";
 
     try {
-      const products = await productsManager.paginate(req.query);
+      const products = await productRepository.paginate(req.query);
       const { payload } = products;
 
       payload.map((item) => {
@@ -286,7 +289,7 @@ class ViewsControllers {
     const roleUser = role === "user";
 
     try {
-      const cartFound = await cartsManager.getById(cid);
+      const cartFound = await cartRepository.findById(cid);
       const cartID = cartFound._id;
 
       if (cartFound && cartFound.products) {

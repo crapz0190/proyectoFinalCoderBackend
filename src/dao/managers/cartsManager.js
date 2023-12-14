@@ -12,7 +12,7 @@ class CarsManager extends BasicManager {
       const createCart = await cartsModel.create(newCart);
       return createCart;
     } catch (error) {
-      console.error(error);
+      console.error(error.message);
     }
   }
 
@@ -34,7 +34,7 @@ class CarsManager extends BasicManager {
       }
       return cart.save();
     } catch (error) {
-      console.error(error);
+      console.error(error.message);
     }
   }
 
@@ -51,7 +51,7 @@ class CarsManager extends BasicManager {
         console.error("Producto no encontrado en el carrito");
       }
     } catch (error) {
-      console.error(error);
+      console.error(error.message);
     }
   }
 }

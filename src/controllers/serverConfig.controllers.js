@@ -6,7 +6,7 @@ import { join } from "node:path";
 import dirname from "../utils.js";
 import session from "express-session";
 import MongoStore from "connect-mongo";
-import env from "../dotenv.js";
+import { confEnv } from "../config.js";
 import passport from "passport";
 import "../passport.js";
 import viewsRouter from "../routes/views.routes.js";
@@ -14,10 +14,9 @@ import productsRouter from "../routes/products.routes.js";
 import cartsRouter from "../routes/carts.routes.js";
 import messagesRouter from "../routes/messages.routes.js";
 import sessionsRouter from "../routes/sessions.routes.js";
+import { productRepository } from "../services/repository/products.repository.js";
 import { createServer } from "node:http";
 import { Server as SocketServer } from "socket.io";
-import { productsModel } from "../dao/models/products.model.js";
-import { productsManager } from "../dao/managers/productsManager.js";
 import methodOverride from "method-override";
 
 class ServerConfig {
@@ -39,9 +38,9 @@ class ServerConfig {
     this.app.use(
       session({
         store: new MongoStore({
-          mongoUrl: env.URI,
+          mongoUrl: confEnv.URI,
         }),
-        secret: env.TOKEN_SECRET_MONGO,
+        secret: confEnv.TOKEN_SECRET_MONGO,
         cookie: { maxAge: 3600000 },
         // saveUninitialized: false,
       })
@@ -71,35 +70,23 @@ class ServerConfig {
     this.io.on("connection", (socketServer) => {
       console.log(`New client connected: ${socketServer.id}`);
 
-      // -------------  INICIO actualizar/eliminar producto  -------------
+      // -------------  actualizar/eliminar producto  -------------
       socketServer.on("idUpdateProducts", async (data) => {
         const pid = data.productId;
 
-        const idFound = await productsManager.getById(pid);
+        const idFound = await productRepository.findById(pid);
         socketServer.emit("loadListProducts", idFound);
       });
 
       socketServer.on("updateListProducts", async (update) => {
         const id = update.idProductForm;
-        await productsManager.updateOne(id, update);
+        await productRepository.updateOne(id, update);
       });
 
       socketServer.on("idDeleteProducts", async (data) => {
         const pid = data.productId;
-        const deleteProduct = await productsManager.deleteOne(pid);
+        const deleteProduct = await productRepository.deleteOne(pid);
         socketServer.emit("loadListProducts", deleteProduct);
-      });
-
-      // ------------------ agregar producto a carrito ----------------
-      socketServer.on("add-to-cart", async (data) => {
-        console.log(data.productId);
-        const pid = data.productId;
-        try {
-          const product = await productsModel.getById({ _id: pid });
-          console.log("product--->", product);
-        } catch (e) {
-          console.error(e.message);
-        }
       });
     });
   };

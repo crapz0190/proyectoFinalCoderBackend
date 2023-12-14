@@ -10,8 +10,8 @@ class MessagesManager extends BasicManager {
     try {
       const response = await messagesModel.find().lean();
       return response;
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.log(error.message);
     }
   }
 }

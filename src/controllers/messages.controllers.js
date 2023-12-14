@@ -1,10 +1,10 @@
-import { messagesManager } from "../dao/managers/messagesManager.js";
+import { messageRepository } from "../services/repository/messages.repository.js";
 
 class MessageController {
   // Metodo GET para mostrar todos los mensajes
   listMessages = async (req, res) => {
     try {
-      const messages = await messagesManager.findAll();
+      const messages = await messageRepository.findAll();
       if (!messages) {
         return res
           .status(404)
@@ -23,7 +23,7 @@ class MessageController {
   messageById = async (req, res) => {
     const { mid } = req.params;
     try {
-      const messages = await messagesManager.getById(mid);
+      const messages = await messageRepository.findById(mid);
       if (!messages) {
         return res
           .status(404)
@@ -50,7 +50,7 @@ class MessageController {
     }
 
     try {
-      const messageCreated = await messagesManager.createOne(obj);
+      const messageCreated = await messageRepository.createOne(obj);
       if (!messageCreated) {
         return res
           .status(500)
@@ -78,7 +78,7 @@ class MessageController {
     }
 
     try {
-      const messageUpdated = await messagesManager.updateOne(mid, obj);
+      const messageUpdated = await messageRepository.updateOne(mid, obj);
       if (!messageUpdated) {
         return res
           .status(500)
@@ -98,7 +98,7 @@ class MessageController {
     const { mid } = req.params;
 
     try {
-      const messageRemoved = await messagesManager.deleteOne(mid);
+      const messageRemoved = await messageRepository.deleteOne(mid);
       if (!messageRemoved) {
         return res
           .status(500)

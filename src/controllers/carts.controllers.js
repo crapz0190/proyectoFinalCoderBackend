@@ -1,13 +1,13 @@
-import { cartsManager } from "../dao/managers/cartsManager.js";
-import { productsManager } from "../dao/managers/productsManager.js";
-import { ticketsManager } from "../dao/managers/ticketsManager.js";
-import { usersManager } from "../dao/managers/usersManager.js";
+import { cartRepository } from "../services/repository/carts.repository.js";
+import { productRepository } from "../services/repository/products.repository.js";
+import { userRepository } from "../services/repository/users.repository.js";
+import { ticketRepository } from "../services/repository/tickets.repository.js";
 
 class CartController {
   // Metodo GET para mostrar todos los carritos
   allCarts = async (req, res) => {
     try {
-      const allCarts = await cartsManager.getAll();
+      const allCarts = await cartRepository.findAll();
       if (allCarts.length === 0) {
         return res
           .status(404)
@@ -24,7 +24,7 @@ class CartController {
   cartById = async (req, res) => {
     const { cid } = req.params;
     try {
-      const cartById = await cartsManager.getById(cid);
+      const cartById = await cartRepository.findById(cid);
       if (!cartById) {
         return res
           .status(404)
@@ -43,7 +43,8 @@ class CartController {
     const idUser = req.user._id;
 
     try {
-      const cart = await cartsManager.getById(cid);
+      // const cart = await cartsManager.getById(cid);
+      const cart = await cartRepository.findById(cid);
       if (!cart || cart.user.toString() !== idUser.toString()) {
         return res.status(404).json({ error: "Cart not found" });
       }
@@ -53,7 +54,9 @@ class CartController {
       // Verificar el stock y realizar la compra
       const productsNotPurchased = await Promise.all(
         productsToPurchase.map(async (productInCart) => {
-          const product = await productsManager.getById(productInCart.product);
+          const product = await productRepository.findById(
+            productInCart.product
+          );
 
           if (!product || product.stock < productInCart.quantity) {
             return productInCart.product;
@@ -72,7 +75,7 @@ class CartController {
         (productId) => productId !== null
       );
 
-      const userFound = await usersManager.getById(cart.user);
+      const userFound = await userRepository.findById(cart.user);
 
       // Generar el ticket
       const ticketData = {
@@ -90,7 +93,7 @@ class CartController {
         }, 0);
       }
 
-      const ticket = await ticketsManager.createOne(ticketData);
+      const ticket = await ticketRepository.createTicket(ticketData);
 
       // Actualizar el carrito con los productos no comprados
       cart.products = productsToPurchase.filter((productInCart) =>
@@ -102,6 +105,7 @@ class CartController {
         .status(200)
         .json({ message: "Successful purchase", ticket: ticket });
     } catch (e) {
+      console.error("Error before generating the ticket:", e);
       return res.status(500).json({ error: e.message });
     }
   };
@@ -109,7 +113,7 @@ class CartController {
   // Metodo POST para crear un carrito
   createCart = async (req, res) => {
     try {
-      const createCart = await cartsManager.createCart();
+      const createCart = await cartRepository.createOne();
       if (!createCart) {
         return res
           .status(500)
@@ -134,7 +138,7 @@ class CartController {
         .json({ status: "error", message: "Invalid input data" });
     }
     try {
-      const updateCart = await cartsManager.addProductsByCart(
+      const updateCart = await cartRepository.updateCart(
         cid,
         pid,
         +quantity,
@@ -150,7 +154,7 @@ class CartController {
   removeCart = async (req, res) => {
     const { cid } = req.params;
 
-    const foundId = await cartsManager.getById(cid);
+    const foundId = await cartRepository.findById(cid);
     if (!foundId) {
       return res
         .status(404)
@@ -158,7 +162,7 @@ class CartController {
     }
 
     try {
-      const removeCart = await cartsManager.deleteOne(cid);
+      const removeCart = await cartRepository.deleteOne(cid);
       if (!removeCart) {
         return res
           .status(500)
@@ -181,7 +185,7 @@ class CartController {
         .json({ status: "error", message: "Invalid input data" });
     }
     try {
-      const removeProductByCart = await cartsManager.deleteProductByCart(
+      const removeProductByCart = await cartRepository.deleteProductByCart(
         cid,
         pid
       );

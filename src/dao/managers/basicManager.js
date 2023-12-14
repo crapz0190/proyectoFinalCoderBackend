@@ -8,7 +8,7 @@ export default class BasicManager {
       const response = await this.model.find();
       return response;
     } catch (error) {
-      console.error(error);
+      console.error(error.message);
     }
   }
   async getById(id) {
@@ -18,7 +18,7 @@ export default class BasicManager {
         .populate(this.populateProps);
       return response;
     } catch (error) {
-      console.error(error);
+      console.error(error.message);
     }
   }
   async createOne(obj) {
@@ -26,17 +26,15 @@ export default class BasicManager {
       const response = await this.model.create(obj);
       return response;
     } catch (error) {
-      console.error(error);
+      console.error(error.message);
     }
   }
   async updateOne(id, obj) {
-    console.log("Intentando eliminar producto con ID:", id);
     try {
       const response = await this.model.findByIdAndUpdate(id, obj);
-      console.log("Producto eliminado:", response);
       return response;
     } catch (error) {
-      console.error(error);
+      console.error(error.message);
     }
   }
   async deleteOne(id) {
@@ -44,8 +42,7 @@ export default class BasicManager {
       const response = await this.model.findByIdAndDelete(id);
       return response;
     } catch (error) {
-      console.error(error);
-      throw new Error("Error al eliminar el documento");
+      console.error(error.message);
     }
   }
 }

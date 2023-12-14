@@ -1,4 +1,4 @@
-import { usersManager } from "../dao/managers/usersManager.js";
+import { userRepository } from "../services/repository/users.repository.js";
 import { hashData } from "../utils.js";
 import { generateToken } from "../libs/jwt.js";
 
@@ -42,7 +42,7 @@ class SessionController {
   restorePassword = async (req, res) => {
     const { email, password } = req.body;
     try {
-      const user = await usersManager.findByEmail(email);
+      const user = await userRepository.findByEmail(email);
       if (!user) {
         return res.status(404).json({ message: "Email does not exist" });
       }

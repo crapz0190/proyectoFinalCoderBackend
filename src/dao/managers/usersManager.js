@@ -11,7 +11,7 @@ class UsersManager extends BasicManager {
       const response = await usersModel.findOne({ email });
       return response;
     } catch (error) {
-      console.error(error);
+      console.error(error.message);
     }
   }
 }
