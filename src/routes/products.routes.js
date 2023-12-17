@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { upload } from "../utils.js";
+import { upload } from "../utils/multer.js";
 import { productController } from "../controllers/products.controllers.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 

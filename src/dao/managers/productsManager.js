@@ -1,6 +1,6 @@
 import { productsModel } from "../models/products.model.js";
 import BasicManager from "./basicManager.js";
-import { confEnv } from "../../config.js";
+import env from "../../utils/dotenv.js";
 
 class ProductsManager extends BasicManager {
   constructor() {
@@ -34,10 +34,10 @@ class ProductsManager extends BasicManager {
         hasPrevPage: result.hasPrevPage,
         hasNextPage: result.hasNextPage,
         prevLink: result.hasPrevPage
-          ? `http://localhost:${confEnv.PORT}/products?limit=${limit}&page=${result.prevPage}`
+          ? `http://localhost:${env.PORT}/products?limit=${limit}&page=${result.prevPage}`
           : null,
         nextLink: result.hasNextPage
-          ? `http://localhost:${confEnv.PORT}/products?limit=${limit}&page=${result.nextPage}`
+          ? `http://localhost:${env.PORT}/products?limit=${limit}&page=${result.nextPage}`
           : null,
       };
       return info;

@@ -1,13 +1,12 @@
 import dotenv from "dotenv";
 import { join } from "node:path";
-import dirname from "./utils.js";
-import mongoose from "mongoose";
+import dirname from "./dirname.js";
 
 dotenv.config({
   path: join(dirname, ".env"),
 });
 
-export const confEnv = {
+const configEnv = {
   NODE_ENV: process.env.NODE_ENV,
   PORT: process.env.PORT || 4000,
   URI: process.env.URI,
@@ -18,16 +17,6 @@ export const confEnv = {
   TOKEN_SECRET_MONGO: process.env.TOKEN_SECRET_MONGO,
 };
 
-console.log(`NODE_ENV = ${confEnv.NODE_ENV}`);
+console.log(`NODE_ENV = ${configEnv.NODE_ENV}`);
 
-export const database = async () => {
-  try {
-    return await mongoose.connect(confEnv.URI);
-  } catch (e) {
-    console.error(e.message);
-  }
-};
-
-mongoose.connection.once("open", (_) => {
-  console.log(">> DB is connected <<");
-});
+export default configEnv;

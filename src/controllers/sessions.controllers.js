@@ -1,5 +1,5 @@
 import { userRepository } from "../services/repository/users.repository.js";
-import { hashData } from "../utils.js";
+import { hashData } from "../utils/bcrypt.js";
 import { generateToken } from "../libs/jwt.js";
 import UserReqDTO from "../dto/user.login.req.dto.js";
 import UserResCurrent from "../dto/user.current.res.dto.js";

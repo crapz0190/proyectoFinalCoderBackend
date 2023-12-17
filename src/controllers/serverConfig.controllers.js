@@ -3,12 +3,12 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import { engine } from "express-handlebars";
 import { join } from "node:path";
-import dirname from "../utils.js";
+import dirname from "../utils/dirname.js";
 import session from "express-session";
 import MongoStore from "connect-mongo";
-import { confEnv } from "../config.js";
+import env from "../utils/dotenv.js";
 import passport from "passport";
-import "../passport.js";
+import "../config/passport.js";
 import viewsRouter from "../routes/views.routes.js";
 import productsRouter from "../routes/products.routes.js";
 import cartsRouter from "../routes/carts.routes.js";
@@ -38,9 +38,9 @@ class ServerConfig {
     this.app.use(
       session({
         store: new MongoStore({
-          mongoUrl: confEnv.URI,
+          mongoUrl: env.URI,
         }),
-        secret: confEnv.TOKEN_SECRET_MONGO,
+        secret: env.TOKEN_SECRET_MONGO,
         cookie: { maxAge: 3600000 },
         // saveUninitialized: false,
       })
@@ -96,4 +96,4 @@ class ServerConfig {
   };
 }
 
-export const serverConfig = new ServerConfig();
+export default new ServerConfig();

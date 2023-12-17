@@ -1,11 +1,11 @@
 import passport from "passport";
-import { userRepository } from "./services/repository/users.repository.js";
-import { cartRepository } from "./services/repository/carts.repository.js";
+import { userRepository } from "../services/repository/users.repository.js";
+import { cartRepository } from "../services/repository/carts.repository.js";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Strategy as GitHubStrategy } from "passport-github2";
 import { Strategy as JWTStrategy, ExtractJwt } from "passport-jwt";
-import { hashData, compareData } from "./utils.js";
-import { confEnv } from "./config.js";
+import { hashData, compareData } from "../utils/bcrypt.js";
+import env from "../utils/dotenv.js";
 
 // -------------- Local ----------------
 passport.use(
@@ -73,7 +73,7 @@ const fromCookies = (req) => {
 
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromExtractors([fromCookies]),
-  secretOrKey: confEnv.TOKEN_SECRET_JWT,
+  secretOrKey: env.TOKEN_SECRET_JWT,
 };
 
 passport.use(
@@ -92,12 +92,11 @@ passport.use(
   "github",
   new GitHubStrategy(
     {
-      clientID: confEnv.GITHUB_CLIENT_ID,
-      clientSecret: confEnv.GITHUB_CLIENT_SECRET,
-      callbackURL: confEnv.GITHUB_CALLBACK_URL,
+      clientID: env.GITHUB_CLIENT_ID,
+      clientSecret: env.GITHUB_CLIENT_SECRET,
+      callbackURL: env.GITHUB_CALLBACK_URL,
     },
     async (accessToken, refreshToken, profile, done) => {
-      console.log("GITHUB ---> ", profile);
       try {
         const userDB = await userRepository.findByEmail(profile._json.email);
         // Login

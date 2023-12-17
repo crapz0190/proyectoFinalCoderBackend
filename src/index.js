@@ -1,13 +1,13 @@
-// import server from "./app.js";
-import { serverConfig } from "./controllers/serverConfig.controllers.js";
-import { database, confEnv } from "./config.js";
+import server from "./controllers/serverConfig.controllers.js";
+import env from "./utils/dotenv.js";
+import database from "./config/database.js";
 
-serverConfig.middlewares();
-serverConfig.handlebars();
-serverConfig.routes();
-serverConfig.socket();
+server.middlewares();
+server.handlebars();
+server.routes();
+server.socket();
 
 database();
-serverConfig.server.listen(confEnv.PORT, () => {
-  console.log(`Server on port: http://localhost:${confEnv.PORT}/login`);
+server.server.listen(env.PORT, () => {
+  console.log(`Server on port: http://localhost:${env.PORT}/login`);
 });

@@ -1,23 +1,11 @@
-import { dirname, extname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { v4 as uuidv4 } from "uuid";
+import dirname from "./dirname.js";
 import multer from "multer";
-import bcrypt from "bcrypt";
-
-const _filename = fileURLToPath(import.meta.url);
-const _dirname = dirname(_filename);
-
-export const hashData = async (data) => {
-  return bcrypt.hash(data, 10);
-};
-
-export const compareData = async (data, hashData) => {
-  return bcrypt.compare(data, hashData);
-};
+import { extname, join } from "node:path";
+import { v4 as uuidv4 } from "uuid";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, join(_dirname, "public", "images"));
+    cb(null, join(dirname, "public", "images"));
   },
   filename: function (req, file, cb) {
     // extrae la extencion del archivo
@@ -41,5 +29,3 @@ export const upload = multer({
     cb(new Error("Only jpeg, jpg, png, & gif file supported!"));
   },
 });
-
-export default _dirname;
