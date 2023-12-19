@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import { nanoid } from "nanoid";
 
 const ticketCollection = "Tickets";
 
@@ -7,7 +8,7 @@ const ticketSchema = new Schema({
     type: String,
     unique: true,
     required: true,
-    default: generateUniqueCode,
+    default: nanoid(10),
   },
   purchase_datetime: {
     type: Date,
@@ -24,8 +25,8 @@ const ticketSchema = new Schema({
   },
 });
 
-function generateUniqueCode() {
-  return Math.random().toString(36).substring(2, 10).toUpperCase();
-}
+// function generateUniqueCode() {
+//   return Math.random().toString(36).substring(2, 10).toUpperCase();
+// }
 
 export const ticketsModel = model(ticketCollection, ticketSchema);
