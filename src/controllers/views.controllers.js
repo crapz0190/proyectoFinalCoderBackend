@@ -328,7 +328,7 @@ class ViewsControllers {
       }
     } catch (error) {
       console.error("Error al obtener el carrito:", error);
-      return res.status(500).json({ status: "error", message: e.message });
+      return res.status(500).json({ status: "error", message: error.message });
     }
   };
 }

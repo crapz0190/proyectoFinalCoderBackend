@@ -41,6 +41,16 @@ class CartController {
   purchasingProcess = async (req, res) => {
     const { cid } = req.params;
     const idUser = req.user._id;
+    
+    function calculateTotalAmount(products) {
+      return products.reduce((total, productInCart) => {
+        // Verificar si el producto tiene stock suficiente
+        if (productInCart.product.stock >= productInCart.quantity) {
+          return total + productInCart.product.price * productInCart.quantity;
+        }
+        return total;
+      }, 0);
+    }
 
     try {
       // const cart = await cartsManager.getById(cid);
@@ -82,16 +92,6 @@ class CartController {
         amount: calculateTotalAmount(productsToPurchase),
         purchaser: userFound.email,
       };
-
-      function calculateTotalAmount(products) {
-        return products.reduce((total, productInCart) => {
-          // Verificar si el producto tiene stock suficiente
-          if (productInCart.product.stock >= productInCart.quantity) {
-            return total + productInCart.product.price * productInCart.quantity;
-          }
-          return total;
-        }, 0);
-      }
 
       const ticket = await ticketRepository.createTicket(ticketData);
 
